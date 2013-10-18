@@ -1,0 +1,9 @@
+## ccs, 18.10.2013
+## cec24@phy.duke.edu
+## crafting a namespace for this version of adapt
+
+## use the C functions
+useDynLib("adapt")
+
+## provide the actual adapt integration function
+export(adapt)
