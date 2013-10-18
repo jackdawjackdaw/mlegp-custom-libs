@@ -1,0 +1,93 @@
+## a namespace file
+## ccs, 18.10.2013
+## cec24@phy.duke.edu
+## i don't totally know what needs to be in here
+
+## to load an SO lib
+## useDynLib("libname")
+## maybe this is what we want
+useDynLib("mlegpFULL")
+## to export functions
+## export(function.name)
+
+## all possible functions
+## % grep '`' *.R | awk '{split($1, a, ":"); print a[2]}'                                             ✹ ✭
+## `ANOVAInteractionEffect`
+## `ANOVAMainEffect`
+## `CV`
+## `FANOVADecomposition`
+## `FANOVADecomposition.gp`
+## `FANOVADecomposition.gp.list`
+## `FunctionalVariance`
+## `Integrate1DCor`
+## `Integrate1DCorSquared`
+## `IntegrateForVariance`
+## `IntegrateInteractionEffectSquared`
+## `IntegrateMainEffectSquared`
+## `OverallMean`
+## `anyReps`
+## `calcCorOneObs`
+## `calcLogLikeManual`
+## `calcMainEffect`
+## `calcPredictionError`
+## `calcPredictionErrorCV`
+## `calcVarMatrix`
+## `computeCorElement`
+## `computeCorElementExcept`
+## `createGP`
+## `createIntegratedCorMatrixExcept`
+## `createWindow`
+## `estimateNugget`
+## `expectedMeanReg`
+## `expectedMeanRegExcept`
+## `getSingularValues`
+## `gp.list`
+## `gpDim`
+## `gpObs`
+## `is.gp`
+## `is.gp.list`
+## `matchIndexes`
+## `mlegp`
+## `nice`
+## `numSingularValues`
+## `plot.gp`
+## `plot.gp.list`
+## `plotInteractionEffect`
+## `plotMainEffects`
+## `plotMainEffects.gp`
+## `plotMainEffects.gp.list`
+## `plotMainEffectsUsingPCWeights`
+## `plotObservedEffects`
+## `plotObservedEffects.gp`
+## `plotObservedEffectsDefault`
+## `predict.gp`
+## `predictMu`
+## `predictNewYCV`
+## `predictNewZ`
+## `print.gp`
+## `print.gp.list`
+## `setGPNames`
+## `setParams`
+## `singularValueImportance`
+## `summary.gp`
+## `summary.gp.list`
+## `toParamIndexes`
+## `varPerReps`
+
+export(mlegp)
+export(CV)
+export(setGPNames, setParams, toParamIndexes)
+export(singularValueImportance, nice, numSingularValues)
+## nuggety ones
+export(estimateNugget, anyReps, varPerReps)
+export(ANOVAInteractionEffect, ANOVAMainEffect)
+export(FANOVADecomposition)
+export(FANOVADecomposition.gp, FANOVADecomposition.gp.list)
+export(gp.list)
+export(is.gp, is.gp.list)
+export(plot.gp, plot.gp.list)
+export(plotMainEffects, plotMainEffects.gp, plotMainEffects.gp.list)
+export(plotObservedEffects, plotObservedEffects.gp)
+export(predict.gp)
+export(print.gp, print.gp.list)
+export(summary.gp, summary.gp.list, uniqueSummary)

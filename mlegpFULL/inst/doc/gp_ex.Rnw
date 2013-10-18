@@ -1,0 +1,89 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+
+%\VignetteIndexEntry{Examples: Gaussian process modeling and diagnostics}
+%\VignetteKeywords{mlegp}
+%\VignettePackage{mlegp}
+
+\section{Examples: Gaussian process fitting and diagnostics}
+<<echo=FALSE,print=FALSE, eval=TRUE, results=hide>>=
+library(mlegp)
+@
+\subsection{A simple example}
+The function {\it mlegp} is used to fit one or more Gaussian processes (GPs) to a vector or matrix of responses observed under the same set of inputs. Data can be input from within R or read from a text file using the command {\it read.table} (type `?read.table' from within R for more information). The example below shows how to fit multiple GPs to multiple outputs $z1$ and $z2$ for the design matrix $x$.
+Diagnostic plots are obtained using the {\it plot} function, which graphs observed values vs. cross-validated predicted values for each GP. The plot obtained from the code below appears in Figure (\ref{fig:diag1}).
+
+<<print=TRUE, echo=TRUE, results=hide, eval=TRUE>>=
+x = -5:5
+z1 = 10 - 5*x + rnorm(length(x))
+z2 = 7 * sin(x) + rnorm(length(x))
+fitMulti = mlegp(x, cbind(z1,z2))
+plot(fitMulti)
+@
+\begin{figure}[htbp]
+  \begin{center}
+<<fig=true, print=FALSE, echo=FALSE>>=
+plot(fitMulti)
+@
+    \caption{Gaussian process diagnostic plots. Open circles, cross-validated predictions; solid black lines, observed values; solid red lines, confidence bands corresponding to cross-validated predictions $\pm$ standard deviation.}
+    \label{fig:diag1}
+  \end{center}
+\end{figure}
+<<echo = TRUE, results=verbatim, eval=TRUE>>=
+@
+
+After the GPs are fit, simply typing the name of the object (e.g., $fitMulti$) will return basic summary information. 
+<<echo = TRUE, results=verbatim, eval=TRUE>>=
+fitMulti
+@
+We can also access individual Gaussian processes by specifying the index. The code below, for examples, displays summary information for the first Gaussian process, including diagnostic statistics of cross-validated root mean squared error (CV RMSE) and cross-validated root max squared error (CV RMaxSE), where squared error corresponds to the squared difference between cross-validated predictions and observed values.
+<<echo = TRUE, results=verbatim, eval=TRUE>>=
+fitMulti[[1]]
+@
+\subsection{An example with replicate observations}
+When replicate observations are available, and the nugget term (or matrix) is known or can be accurately estimated, it is computationally more efficient and more accurate to use a plug-in estimate for the nugget term (or matrix) and to fit a GP to a set of sample means. This is done by setting `nugget.known = 1' in the call to {\it mlegp}, while still passing in a vector or matrix of all observations. A nugget value can be specified exactly by setting the `nugget' argument to the (estimated) value of $\sigmaNug$ as in the code below.   
+<<print=TRUE, echo=TRUE, results=hide, eval=TRUE>>=
+x = c(1:10, 1:10, 1:10)
+y = x + rnorm(length(x), sd = 1)
+fit = mlegp(x,y, nugget = 1, nugget.known = 1)
+@
+If the argument `nugget' is not specified, a weighted average of sample variances will be used.
+<<print=TRUE, echo=TRUE, results=hide, eval=TRUE>>=
+fit = mlegp(x,y, nugget.known = 1)
+@
+<<print=TRUE, echo = TRUE, results = verbatim, eval=TRUE>>=
+fit$nugget 
+@
+
+\subsection{Heteroscedastic responses and the nugget matrix}
+In cases where the responses are heteroscedastic (have non-constant variance), it is possible to specify the diagonal nugget matrix exactly or up to a multiplicative constant. 
+Currently, we recommend specifying the nugget matrix based on sample variances for replicate design points (which is easily obtained using the function {\it varPerReps}), based on the results of a separate statistical model, or based on prior information.      
+
+In the example below, we demonstrate how to fit a GP with a constant nugget term, a GP where the diagonal nugget matrix is specified up to a multiplicative constant, and a GP where the nugget matrix is specified exactly. First we generate heteroscedastic data, with variance related to the design parameter.   
+
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+x = seq(0,1,length.out=20)
+z = x + rnorm(length(x), sd = 0.10*x)   # variance is not constant
+@
+
+By default, a nugget term is automatically estimated if there are replicates in the design matrix, and is not estimated otherwise. However, one can estimate a nugget term by specifying an initial scalar value for the \lq nugget\rq\ argument during the call to
+{\it mlegp}. This is done in the code below.  
+
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+fit1 = mlegp(x,z, nugget = mean((0.1*x)**2))
+@
+Alternatively, one can set \lq nugget\rq\ equal $N_s$, which specifies the nugget matrix up to a multiplicative constant, and is demonstrated in the code below. 
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+fit2 = mlegp(x,z, nugget = (.1*x)**2)
+@
+Finally, we completely and {\it exactly} specify the nugget matrix $N$ by also setting `nugget.known = 1'.  
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+fit3 = mlegp(x,z, nugget.known = 1, nugget = (.1*x)**2)
+@
+We demonstrate the advantage of using a non-constant nugget term by comparing the root mean squared error (RMSE) between the true response and predictions from each fitted GP. 
+Importantly, predictions are less accurate (have higher root mean squared errors) and can have far from nominal coverage probabilities when a constant nugget is incorrectly assumed. 
+<<print = TRUE, results = verbatim, eval = TRUE>>=
+sqrt(mean((x-predict(fit1))**2))
+sqrt(mean((x-predict(fit2))**2))
+sqrt(mean((x-predict(fit3))**2))
+@
+
